@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CTR Calculator</title>
+  <style>
+    /* Samsung website design principles */
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f2f2f2;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px;
+      background-color: white;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #1428a0;
+      margin-bottom: 30px;
+    }
+
+    .box-container {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      grid-gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .box {
+      background-color: #f2f2f2;
+      padding: 20px;
+      text-align: center;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .box h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      color: #1428a0;
+    }
+
+    .box p {
+      margin: 0;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .box small {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .non-calculated-field {
+      background-color: #f2f2f2;
+      color: #666;
+    }
+
+    .calculated-field {
+      background-color: #e3f2fd;
+      color: #1565c0;
+    }
+
+    .input-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+
+    .input-container label {
+      font-size: 16px;
+      color: #1428a0;
+      margin-right: 10px;
+    }
+
+    .input-container input {
+      padding: 10px 15px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin: 0 10px;
+      width: 200px;
+    }
+
+    .input-container input[type="text"] {
+      width: 400px;
+      background-color: #e3f2fd;
+      border-color: #1565c0;
+    }
+
+    .input-container input[type="number"] {
+      background-color: #f2f2f2;
+      border-color: #666;
+    }
+
+    .input-container button {
+      padding: 10px 15px;
+      font-size: 16px;
+      background-color: #1428a0;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .description {
+      text-align: center;
+      color: #666;
+      font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px;
+      }
+
+      .box-container {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .input-container {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .input-container input[type="text"] {
+        width: 100%;
+      }
+
+      .input-container input[type="number"] {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>CTR Calculator</h1>
+    
+    <div class="box-container">
+      <div class="box non-calculated-field">
+        <h3>Current Monthly Revenue</h3>
+        <small>ASIN Current Monthly Revenue ($)</small>
+        <p id="asin-monthly-revenue">0.00</p>
+      </div>
+      <div class="box non-calculated-field">
+        <h3>Current CTR</h3>
+        <small>Current Click-Through Rate (%)</small>
+        <p id="current-ctr">0.00</p>
+      </div>
+      <div class="box calculated-field">
+        <h3>CTR Increase</h3>
+        <small>Projected Increase in Click-Through Rate (%)</small>
+        <p id="ctr-increase">0.00</p>
+      </div>
+      <div class="box calculated-field">
+        <h3>New CTR</h3>
+        <small>Projected Click-Through Rate (%)</small>
+        <p id="new-ctr">0.00</p>
+      </div>
+      <div class="box calculated-field">
+        <h3>% Increase in CTR</h3>
+        <small>Percentage Increase in Click-Through Rate</small>
+        <p id="ctr-increase-percentage">0.00%</p>
+      </div>
+      <div class="box calculated-field">
+        <h3>Estimated Revenue Increase</h3>
+        <small>Projected Increase in Monthly Revenue ($)</small>
+        <p id="estimated-revenue-increase">0.00</p>
+      </div>
+      <div class="box calculated-field">
+        <h3>New Estimated Revenue</h3>
+        <small>Projected Monthly Revenue ($)</small>
+        <p id="new-estimated-revenue">0.00</p>
+      </div>
+    </div>
+    
+    <div class="input-container">
+      <label for="asin-monthly-revenue-input">ASIN Current Monthly Revenue ($)</label>
+      <input type="text" id="asin-monthly-revenue-input" placeholder="Enter ASIN Current Monthly Revenue" />
+      <label for="current-ctr-input">Current CTR (%)</label>
+      <input type="number" id="current-ctr-input" placeholder="Enter Current CTR" />
+      <label for="ctr-increase-input">CTR Increase (%)</label>
+      <input type="number" id="ctr-increase-input" placeholder="Enter CTR Increase" />
+      <button onclick="calculateCTR()">Calculate</button>
+    </div>
+    
+    <div class="description">
+      <p>The "New CTR" is calculated by adding the "CTR Increase" to the "Current CTR". The "New Estimated Revenue" is calculated by adding the "Estimated Revenue Increase" to the "ASIN Current Monthly Revenue".</p>
+      <p>The calculated fields (in blue) represent the projected values based on the user's input, while the non-calculated fields (in grey) display the current values.</p>
+    </div>
+  </div>
+  
+  <script>
+    // Sample data
+    const sampleData = {
+      asinMonthlyRevenue: 5000,
+      currentCtr: 1,
+      ctrIncrease: 0.5,
+      newCtr: 1.5,
+      ctrIncreasePercentage: 50,
+      estimatedRevenueIncrease: 2500,
+      newEstimatedRevenue: 7500
+    };
+    
+    function calculateCTR() {
+      const asinMonthlyRevenue = parseFloat(document.getElementById('asin-monthly-revenue-input').value);
+      const currentCtr = parseFloat(document.getElementById('current-ctr-input').value);
+      const ctrIncrease = parseFloat(document.getElementById('ctr-increase-input').value);
+      
+      if (asinMonthlyRevenue && currentCtr && ctrIncrease) {
+        const newCtr = currentCtr + ctrIncrease;
+        const ctrIncreasePercentage = (ctrIncrease / currentCtr) * 100;
+        const estimatedRevenueIncrease = asinMonthlyRevenue * (ctrIncrease / currentCtr);
+        const newEstimatedRevenue = asinMonthlyRevenue + estimatedRevenueIncrease;
+        
+        document.getElementById('asin-monthly-revenue').textContent = asinMonthlyRevenue.toFixed(2);
+        document.getElementById('current-ctr').textContent = currentCtr.toFixed(2);
+        document.getElementById('ctr-increase').textContent = ctrIncrease.toFixed(2);
+        document.getElementById('new-ctr').textContent = newCtr.toFixed(2);
+        document.getElementById('ctr-increase-percentage').textContent = ctrIncreasePercentage.toFixed(2) + '%';
+        document.getElementById('estimated-revenue-increase').textContent = estimatedRevenueIncrease.toFixed(2);
+        document.getElementById('new-estimated-revenue').textContent = newEstimatedRevenue.toFixed(2);
+        
+        // Clear input fields
+        document.getElementById('asin-monthly-revenue-input').value = '';
+        document.getElementById('current-ctr-input').value = '';
+        document.getElementById('ctr-increase-input').value = '';
+      } else {
+        alert('Please fill in all the fields.');
+      }
+    }
+    
+    // Populate initial data
+    document.getElementById('asin-monthly-revenue').textContent = sampleData.asinMonthlyRevenue.toFixed(2);
+    document.getElementById('current-ctr').textContent = sampleData.currentCtr.toFixed(2);
+    document.getElementById('ctr-increase').textContent = sampleData.ctrIncrease.toFixed(2);
+    document.getElementById('new-ctr').textContent = sampleData.newCtr.toFixed(2);
+    document.getElementById('ctr-increase-percentage').textContent = sampleData.ctrIncreasePercentage.toFixed(2) + '%';
+    document.getElementById('estimated-revenue-increase').textContent = sampleData.estimatedRevenueIncrease.toFixed(2);
+    document.getElementById('new-estimated-revenue').textContent = sampleData.newEstimatedRevenue.toFixed(2);
+  </script>
+</body>
+</html>
